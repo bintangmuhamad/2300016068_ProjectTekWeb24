@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+.bg-greenGoPalm {
+  background-color: #6DBF57; /* Warna hijau khas GoPalm */
+}
+
+.bg-orangeGoPalm {
+  background-color: #FFA500; /* Warna orange khas GoPalm */
+}
