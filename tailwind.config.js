@@ -1,3 +1,5 @@
+// tailwind.config.js
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -7,7 +9,7 @@ module.exports = {
     extend: {
       colors: {
         greenGoPalm: '#6DBF57',   // Hijau khas GoPalm
-        orangeGoPalm: '#FFA500',  // Orange
+        orangeGoPalm: '#FFA500',  // Orange khas GoPalm
       },
     },
   },

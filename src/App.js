@@ -1,3 +1,5 @@
+// src/App.js
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -5,7 +7,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Schedule from './pages/Schedule';
 import Harvest from './pages/Harvest';
-import Report from './pages/Report';
+import Report from './pages/ReportPage'; // Pastikan nama file sesuai
 
 function App() {
   return (

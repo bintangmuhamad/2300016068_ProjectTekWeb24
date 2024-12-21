@@ -1,3 +1,5 @@
+// src/components/ScheduleManagement.js
+
 import React, { useState, useEffect } from 'react';
 
 function ScheduleManagement() {
@@ -12,25 +14,47 @@ function ScheduleManagement() {
     }
   }, []);
 
+  // Menangani perubahan input pada formulir
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewSchedule((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Menambah jadwal baru
   const addSchedule = () => {
     if (newSchedule.date && newSchedule.type && newSchedule.description) {
       const updatedSchedules = [
         ...schedules,
-        { ...newSchedule, id: schedules.length + 1, status: 'Belum Dilaksanakan' },
+        { ...newSchedule, id: Date.now(), status: 'Belum Dilaksanakan' },
       ];
       setSchedules(updatedSchedules);
       localStorage.setItem('schedules', JSON.stringify(updatedSchedules)); // Menyimpan data ke localStorage
       setNewSchedule({ date: '', type: '', description: '' });
+    } else {
+      alert('Harap isi semua field sebelum menambah jadwal.');
     }
   };
 
+  // Menghapus jadwal berdasarkan ID
   const deleteSchedule = (id) => {
-    const updatedSchedules = schedules.filter((schedule) => schedule.id !== id);
+    if (window.confirm('Apakah Anda yakin ingin menghapus jadwal ini?')) {
+      const updatedSchedules = schedules.filter((schedule) => schedule.id !== id);
+      setSchedules(updatedSchedules);
+      localStorage.setItem('schedules', JSON.stringify(updatedSchedules)); // Menyimpan data yang sudah diperbarui
+    }
+  };
+
+  // Mengubah status jadwal berdasarkan ID
+  const toggleStatus = (id) => {
+    const updatedSchedules = schedules.map((schedule) => {
+      if (schedule.id === id) {
+        return {
+          ...schedule,
+          status: schedule.status === 'Belum Dilaksanakan' ? 'Sudah Dilaksanakan' : 'Belum Dilaksanakan',
+        };
+      }
+      return schedule;
+    });
     setSchedules(updatedSchedules);
     localStorage.setItem('schedules', JSON.stringify(updatedSchedules)); // Menyimpan data yang sudah diperbarui
   };
@@ -38,6 +62,8 @@ function ScheduleManagement() {
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-greenGoPalm mb-6">Manajemen Perawatan</h2>
+      
+      {/* Formulir untuk menambah jadwal perawatan */}
       <div className="mb-6">
         <input
           type="date"
@@ -70,6 +96,7 @@ function ScheduleManagement() {
         </button>
       </div>
 
+      {/* Tabel untuk menampilkan jadwal perawatan */}
       <table className="min-w-full border-collapse table-auto">
         <thead>
           <tr>
@@ -81,22 +108,36 @@ function ScheduleManagement() {
           </tr>
         </thead>
         <tbody>
-          {schedules.map((schedule) => (
-            <tr key={schedule.id}>
-              <td className="border px-4 py-2">{schedule.date}</td>
-              <td className="border px-4 py-2">{schedule.type}</td>
-              <td className="border px-4 py-2">{schedule.description}</td>
-              <td className="border px-4 py-2">{schedule.status}</td>
-              <td className="border px-4 py-2">
-                <button
-                  onClick={() => deleteSchedule(schedule.id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Hapus
-                </button>
-              </td>
+          {schedules.length === 0 ? (
+            <tr>
+              <td colSpan="5" className="px-4 py-2 text-center">Tidak ada jadwal perawatan.</td>
             </tr>
-          ))}
+          ) : (
+            schedules.map((schedule) => (
+              <tr key={schedule.id}>
+                <td className="border px-4 py-2">{schedule.date}</td>
+                <td className="border px-4 py-2">{schedule.type}</td>
+                <td className="border px-4 py-2">{schedule.description}</td>
+                <td className={`border px-4 py-2 ${schedule.status === 'Sudah Dilaksanakan' ? 'text-green-600' : 'text-red-600'}`}>
+                  {schedule.status}
+                </td>
+                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => toggleStatus(schedule.id)}
+                    className={`mr-2 ${schedule.status === 'Belum Dilaksanakan' ? 'bg-yellow-500' : 'bg-green-500'} text-white py-1 px-2 rounded hover:opacity-75`}
+                  >
+                    {schedule.status === 'Belum Dilaksanakan' ? 'Mark as Done' : 'Mark as Pending'}
+                  </button>
+                  <button
+                    onClick={() => deleteSchedule(schedule.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
