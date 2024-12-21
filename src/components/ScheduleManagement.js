@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 function ScheduleManagement() {
   const [schedules, setSchedules] = useState([]);
   const [newSchedule, setNewSchedule] = useState({ date: '', type: '', description: '' });
+  const [editScheduleId, setEditScheduleId] = useState(null);
+  const [editFormData, setEditFormData] = useState({ date: '', type: '', description: '' });
 
   // Mengambil data dari localStorage saat pertama kali komponen dimuat
   useEffect(() => {
@@ -14,7 +16,7 @@ function ScheduleManagement() {
     }
   }, []);
 
-  // Menangani perubahan input pada formulir
+  // Menangani perubahan input pada formulir tambah jadwal
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewSchedule((prev) => ({ ...prev, [name]: value }));
@@ -59,6 +61,53 @@ function ScheduleManagement() {
     localStorage.setItem('schedules', JSON.stringify(updatedSchedules)); // Menyimpan data yang sudah diperbarui
   };
 
+  // Memulai proses edit jadwal
+  const handleEditClick = (schedule) => {
+    setEditScheduleId(schedule.id);
+    setEditFormData({
+      date: schedule.date,
+      type: schedule.type,
+      description: schedule.description,
+    });
+  };
+
+  // Menangani perubahan input pada formulir edit jadwal
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Menyimpan perubahan jadwal
+  const handleEditFormSubmit = (e) => {
+    e.preventDefault();
+
+    if (editFormData.date && editFormData.type && editFormData.description) {
+      const updatedSchedules = schedules.map((schedule) => {
+        if (schedule.id === editScheduleId) {
+          return {
+            ...schedule,
+            date: editFormData.date,
+            type: editFormData.type,
+            description: editFormData.description,
+          };
+        }
+        return schedule;
+      });
+      setSchedules(updatedSchedules);
+      localStorage.setItem('schedules', JSON.stringify(updatedSchedules)); // Menyimpan data yang sudah diperbarui
+      setEditScheduleId(null);
+      setEditFormData({ date: '', type: '', description: '' });
+    } else {
+      alert('Harap isi semua field sebelum menyimpan perubahan.');
+    }
+  };
+
+  // Membatalkan proses edit
+  const handleCancelClick = () => {
+    setEditScheduleId(null);
+    setEditFormData({ date: '', type: '', description: '' });
+  };
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-greenGoPalm mb-6">Manajemen Perawatan</h2>
@@ -96,6 +145,53 @@ function ScheduleManagement() {
         </button>
       </div>
 
+      {/* Formulir edit jadwal perawatan */}
+      {editScheduleId && (
+        <form onSubmit={handleEditFormSubmit} className="mb-6 bg-gray-100 p-4 rounded">
+          <h3 className="text-xl font-semibold mb-4">Edit Jadwal</h3>
+          <div className="flex flex-wrap">
+            <input
+              type="date"
+              name="date"
+              value={editFormData.date}
+              onChange={handleEditFormChange}
+              className="border border-gray-300 p-2 rounded mr-2 mb-2"
+            />
+            <input
+              type="text"
+              name="type"
+              value={editFormData.type}
+              onChange={handleEditFormChange}
+              placeholder="Jenis Perawatan"
+              className="border border-gray-300 p-2 rounded mr-2 mb-2"
+            />
+            <input
+              type="text"
+              name="description"
+              value={editFormData.description}
+              onChange={handleEditFormChange}
+              placeholder="Deskripsi"
+              className="border border-gray-300 p-2 rounded mr-2 mb-2"
+            />
+            <div className="flex items-center mb-2">
+              <button
+                type="submit"
+                className="bg-blue-500 text-white py-2 px-4 rounded mr-2 hover:bg-blue-600"
+              >
+                Simpan
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelClick}
+                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
       {/* Tabel untuk menampilkan jadwal perawatan */}
       <table className="min-w-full border-collapse table-auto">
         <thead>
@@ -127,6 +223,12 @@ function ScheduleManagement() {
                     className={`mr-2 ${schedule.status === 'Belum Dilaksanakan' ? 'bg-yellow-500' : 'bg-green-500'} text-white py-1 px-2 rounded hover:opacity-75`}
                   >
                     {schedule.status === 'Belum Dilaksanakan' ? 'Mark as Done' : 'Mark as Pending'}
+                  </button>
+                  <button
+                    onClick={() => handleEditClick(schedule)}
+                    className="bg-blue-500 text-white py-1 px-2 rounded mr-2 hover:bg-blue-600"
+                  >
+                    Edit
                   </button>
                   <button
                     onClick={() => deleteSchedule(schedule.id)}
