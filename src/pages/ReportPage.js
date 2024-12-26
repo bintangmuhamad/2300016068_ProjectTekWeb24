@@ -3,10 +3,13 @@
 import React from 'react';
 import Report from '../components/Report';
 
+/**
+ * Halaman ReportPage untuk menampilkan laporan
+ */
 function ReportPage() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-greenGoPalm mb-4">Laporan</h1>
+      <h1 className="text-3xl font-bold text-orangeGoPalm mb-4">Laporan</h1>
       <Report />
     </div>
   );
