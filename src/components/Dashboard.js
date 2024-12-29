@@ -15,7 +15,7 @@ function Dashboard() {
         <h3 className="text-xl text-greenGoPalm mb-2">Ringkasan Jadwal Perawatan</h3>
         <ScheduleManagement />
       </div>
-      {/* Anda bisa menambahkan ringkasan atau komponen lain di sini */}
+      {/* Target menambahkan ringkasan atau komponen lain di sini */}
     </div>
   );
 }
