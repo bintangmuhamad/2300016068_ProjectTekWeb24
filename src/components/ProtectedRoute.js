@@ -1,23 +1,21 @@
 // src/components/ProtectedRoute.js
 
-import React, { useContext } from 'react';
-import { AuthContext } from './AuthContext';
-import { Navigate } from 'react-router-dom';
+import React, { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
 /**
- * Komponen ProtectedRoute untuk melindungi rute tertentu
- * @param {object} props - Properti komponen
- * @returns {JSX.Element} - Komponen yang diizinkan atau redirect ke login
+ * Komponen ProtectedRoute untuk melindungi rute tertentu.
  */
 function ProtectedRoute({ children }) {
   const { user } = useContext(AuthContext);
-  
-  // Jika pengguna belum login, redirect ke halaman login
+
+  // Jika pengguna belum login, redirect ke halaman login.
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Jika pengguna sudah login, tampilkan komponen yang diinginkan
+  // Jika pengguna sudah login, tampilkan konten yang diminta.
   return children;
 }
 

@@ -1,10 +1,10 @@
 // src/pages/ReportPage.js
 
-import React from 'react';
-import Report from '../components/Report';
+import React from "react";
+import Report from "../components/Report";
 
 /**
- * Halaman ReportPage untuk menampilkan laporan
+ * Halaman ReportPage untuk menampilkan laporan.
  */
 function ReportPage() {
   return (

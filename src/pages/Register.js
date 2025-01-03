@@ -1,46 +1,36 @@
 // src/pages/Register.js
 
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../components/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
- * Komponen Register untuk mendaftar pengguna baru
+ * Halaman Register untuk pendaftaran pengguna baru.
  */
 function Register() {
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
 
-  // State untuk menyimpan data form
-  const [formData, setFormData] = useState({ username: '', password: '', confirmPassword: '' });
-  const [error, setError] = useState('');
-
-  /**
-   * Menangani perubahan input pada form
-   * @param {object} e - Event perubahan input
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  /**
-   * Menangani submit form registrasi
-   * @param {object} e - Event submit form
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { username, password, confirmPassword } = formData;
-
-    // Validasi sederhana
-    if (password !== confirmPassword) {
-      setError('Password dan konfirmasi password tidak cocok.');
+    if (formData.password !== formData.confirmPassword) {
+      setError("Password dan konfirmasi password tidak cocok.");
       return;
     }
-
-    const result = register(username, password);
+    const result = register(formData.username, formData.password);
     if (result.success) {
-      navigate('/'); // Redirect ke home setelah registrasi
+      navigate("/login");
     } else {
       setError(result.message);
     }
@@ -49,7 +39,9 @@ function Register() {
   return (
     <div className="flex justify-center items-center h-screen bg-orangeGoPalm">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-greenGoPalm mb-6 text-center">Daftar</h2>
+        <h2 className="text-2xl font-bold text-greenGoPalm mb-6 text-center">
+          Daftar
+        </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -93,7 +85,7 @@ function Register() {
           </button>
         </form>
         <p className="mt-4 text-center text-gray-600">
-          Sudah punya akun?{' '}
+          Sudah punya akun?{" "}
           <Link to="/login" className="text-orangeGoPalm hover:underline">
             Login di sini
           </Link>

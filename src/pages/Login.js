@@ -1,39 +1,28 @@
 // src/pages/Login.js
 
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../components/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
- * Komponen Login untuk autentikasi pengguna
+ * Halaman Login untuk autentikasi pengguna.
  */
 function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
 
-  // State untuk menyimpan data form
-  const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
-
-  /**
-   * Menangani perubahan input pada form
-   * @param {object} e - Event perubahan input
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  /**
-   * Menangani submit form login
-   * @param {object} e - Event submit form
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { username, password } = formData;
-    const result = login(username, password);
+    const result = login(formData.username, formData.password);
     if (result.success) {
-      navigate('/'); // Redirect ke home setelah login
+      navigate("/");
     } else {
       setError(result.message);
     }
@@ -42,7 +31,9 @@ function Login() {
   return (
     <div className="flex justify-center items-center h-screen bg-orangeGoPalm">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-greenGoPalm mb-6 text-center">Login</h2>
+        <h2 className="text-2xl font-bold text-greenGoPalm mb-6 text-center">
+          Login
+        </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -75,7 +66,7 @@ function Login() {
           </button>
         </form>
         <p className="mt-4 text-center text-gray-600">
-          Belum punya akun?{' '}
+          Belum punya akun?{" "}
           <Link to="/register" className="text-orangeGoPalm hover:underline">
             Daftar di sini
           </Link>

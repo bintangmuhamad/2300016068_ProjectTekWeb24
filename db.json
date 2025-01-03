@@ -1,0 +1,13 @@
+{
+  "schedules": [
+    {
+      "id": "d417",
+      "date": "2025-01-02",
+      "type": "semprot",
+      "description": "ibu ibu semprot",
+      "status": "Sudah Dilaksanakan"
+    }
+  ],
+  "harvests": [],
+  "reports": []
+}
