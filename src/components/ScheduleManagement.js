@@ -1,94 +1,54 @@
-// src/components/ScheduleManagement.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 /**
- * BASE_URL untuk JSON Server.
- * Pastikan URL ini sesuai dengan lokasi di mana JSON Server berjalan.
+ * Komponen ScheduleManagement untuk mengelola jadwal perawatan.
+ * - Responsif untuk berbagai ukuran layar dengan tabel adaptif.
+ * - Fitur CRUD: Tambah, Hapus, Edit, dan Toggle Status Jadwal.
  */
-const BASE_URL = "http://localhost:5000";
-
 function ScheduleManagement() {
   const [schedules, setSchedules] = useState([]);
-  const [newSchedule, setNewSchedule] = useState({ date: "", type: "", description: "" });
+  const [newSchedule, setNewSchedule] = useState({ date: '', type: '', description: '' });
   const [editScheduleId, setEditScheduleId] = useState(null);
-  const [editFormData, setEditFormData] = useState({ date: "", type: "", description: "" });
+  const [editFormData, setEditFormData] = useState({ date: '', type: '', description: '' });
 
-  /**
-   * Mengambil data jadwal dari JSON Server saat komponen dimuat.
-   */
+  // Fetch data dari server saat komponen dimuat
   useEffect(() => {
-    fetch(`${BASE_URL}/schedules`)
-      .then((response) => response.json())
-      .then((data) => setSchedules(data))
-      .catch((error) => console.error("Error fetching schedules:", error));
+    axios.get('http://localhost:5000/schedules').then((response) => {
+      setSchedules(response.data);
+    });
   }, []);
 
-  /**
-   * Menangani perubahan input pada form tambah.
-   */
+  // Handler perubahan input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewSchedule((prev) => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Menambah jadwal baru ke JSON Server.
-   */
+  // Tambah jadwal baru
   const addSchedule = () => {
-    const { date, type, description } = newSchedule;
-
-    if (date && type && description) {
-      fetch(`${BASE_URL}/schedules`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newSchedule, status: "Belum Dilaksanakan" }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setSchedules((prev) => [...prev, data]);
-          setNewSchedule({ date: "", type: "", description: "" });
-        })
-        .catch((error) => console.error("Error adding schedule:", error));
+    if (newSchedule.date && newSchedule.type && newSchedule.description) {
+      axios
+        .post('http://localhost:5000/schedules', { ...newSchedule, status: 'Belum Dilaksanakan' })
+        .then((response) => {
+          setSchedules([...schedules, response.data]);
+          setNewSchedule({ date: '', type: '', description: '' });
+        });
     } else {
-      alert("Harap isi semua field sebelum menambah jadwal.");
+      alert('Harap isi semua field sebelum menambah jadwal.');
     }
   };
 
-  /**
-   * Menghapus jadwal dari JSON Server.
-   */
+  // Hapus jadwal berdasarkan ID
   const deleteSchedule = (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
-      fetch(`${BASE_URL}/schedules/${id}`, { method: "DELETE" })
-        .then(() => setSchedules((prev) => prev.filter((schedule) => schedule.id !== id)))
-        .catch((error) => console.error("Error deleting schedule:", error));
+    if (window.confirm('Apakah Anda yakin ingin menghapus jadwal ini?')) {
+      axios.delete(`http://localhost:5000/schedules/${id}`).then(() => {
+        setSchedules(schedules.filter((schedule) => schedule.id !== id));
+      });
     }
   };
 
-  /**
-   * Mengubah status jadwal antara "Belum Dilaksanakan" dan "Sudah Dilaksanakan".
-   */
-  const toggleStatus = (id) => {
-    const schedule = schedules.find((s) => s.id === id);
-    const updatedStatus = schedule.status === "Belum Dilaksanakan" ? "Sudah Dilaksanakan" : "Belum Dilaksanakan";
-
-    fetch(`${BASE_URL}/schedules/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: updatedStatus }),
-    })
-      .then(() => {
-        setSchedules((prev) =>
-          prev.map((s) => (s.id === id ? { ...s, status: updatedStatus } : s))
-        );
-      })
-      .catch((error) => console.error("Error toggling schedule status:", error));
-  };
-
-  /**
-   * Memulai proses edit jadwal.
-   */
+  // Edit jadwal
   const handleEditClick = (schedule) => {
     setEditScheduleId(schedule.id);
     setEditFormData({
@@ -98,53 +58,55 @@ function ScheduleManagement() {
     });
   };
 
-  /**
-   * Menyimpan perubahan jadwal ke JSON Server.
-   */
-  const handleEditFormSubmit = (e) => {
-    e.preventDefault();
-    const { date, type, description } = editFormData;
-
-    if (date && type && description) {
-      fetch(`${BASE_URL}/schedules/${editScheduleId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, type, description }),
-      })
-        .then((response) => response.json())
-        .then((updatedSchedule) => {
-          setSchedules((prev) =>
-            prev.map((schedule) => (schedule.id === editScheduleId ? updatedSchedule : schedule))
-          );
-          setEditScheduleId(null);
-          setEditFormData({ date: "", type: "", description: "" });
-        })
-        .catch((error) => console.error("Error updating schedule:", error));
-    } else {
-      alert("Harap isi semua field sebelum menyimpan perubahan.");
-    }
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Membatalkan proses edit.
-   */
+  const handleEditFormSubmit = (e) => {
+    e.preventDefault();
+    axios.put(`http://localhost:5000/schedules/${editScheduleId}`, editFormData).then(() => {
+      setSchedules(
+        schedules.map((schedule) =>
+          schedule.id === editScheduleId ? { ...schedule, ...editFormData } : schedule
+        )
+      );
+      setEditScheduleId(null);
+      setEditFormData({ date: '', type: '', description: '' });
+    });
+  };
+
   const handleCancelClick = () => {
     setEditScheduleId(null);
-    setEditFormData({ date: "", type: "", description: "" });
+    setEditFormData({ date: '', type: '', description: '' });
+  };
+
+  // Toggle status jadwal
+  const toggleStatus = (id) => {
+    const schedule = schedules.find((schedule) => schedule.id === id);
+    const updatedSchedule = {
+      ...schedule,
+      status: schedule.status === 'Belum Dilaksanakan' ? 'Sudah Dilaksanakan' : 'Belum Dilaksanakan',
+    };
+    axios.put(`http://localhost:5000/schedules/${id}`, updatedSchedule).then(() => {
+      setSchedules(
+        schedules.map((schedule) => (schedule.id === id ? updatedSchedule : schedule))
+      );
+    });
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-orangeGoPalm mb-4">Manajemen Perawatan</h2>
+    <div className="p-4 bg-white shadow-lg rounded-lg">
+      <h2 className="text-xl font-semibold text-greenGoPalm mb-4">Manajemen Jadwal Perawatan</h2>
 
-      {/* Form Tambah */}
-      <div className="mb-6">
+      {/* Form Tambah Jadwal */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <input
           type="date"
           name="date"
           value={newSchedule.date}
           onChange={handleInputChange}
-          className="border border-gray-300 p-2 rounded mr-2"
+          className="border border-gray-300 rounded px-3 py-2 w-full"
         />
         <input
           type="text"
@@ -152,7 +114,7 @@ function ScheduleManagement() {
           value={newSchedule.type}
           onChange={handleInputChange}
           placeholder="Jenis Perawatan"
-          className="border border-gray-300 p-2 rounded mr-2"
+          className="border border-gray-300 rounded px-3 py-2 w-full"
         />
         <input
           type="text"
@@ -160,112 +122,110 @@ function ScheduleManagement() {
           value={newSchedule.description}
           onChange={handleInputChange}
           placeholder="Deskripsi"
-          className="border border-gray-300 p-2 rounded mr-2"
+          className="border border-gray-300 rounded px-3 py-2 w-full"
         />
         <button
           onClick={addSchedule}
-          className="bg-orangeGoPalm text-white py-2 px-4 rounded hover:bg-greenGoPalm"
+          className="bg-greenGoPalm text-white py-2 px-4 rounded w-full md:col-span-1 hover:bg-orangeGoPalm transition duration-300"
         >
           Tambah Jadwal
         </button>
       </div>
 
-      {/* Form Edit */}
+      {/* Form Edit Jadwal */}
       {editScheduleId && (
-        <form onSubmit={handleEditFormSubmit} className="mb-6">
-          <input
-            type="date"
-            name="date"
-            value={editFormData.date}
-            onChange={(e) =>
-              setEditFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-            }
-            className="border border-gray-300 p-2 rounded mr-2"
-          />
-          <input
-            type="text"
-            name="type"
-            value={editFormData.type}
-            onChange={(e) =>
-              setEditFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-            }
-            placeholder="Jenis Perawatan"
-            className="border border-gray-300 p-2 rounded mr-2"
-          />
-          <input
-            type="text"
-            name="description"
-            value={editFormData.description}
-            onChange={(e) =>
-              setEditFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-            }
-            placeholder="Deskripsi"
-            className="border border-gray-300 p-2 rounded mr-2"
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mr-2"
-          >
-            Simpan
-          </button>
-          <button
-            type="button"
-            onClick={handleCancelClick}
-            className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-          >
-            Batal
-          </button>
+        <form onSubmit={handleEditFormSubmit} className="mb-6 bg-gray-100 p-4 rounded">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              type="date"
+              name="date"
+              value={editFormData.date}
+              onChange={handleEditFormChange}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            <input
+              type="text"
+              name="type"
+              value={editFormData.type}
+              onChange={handleEditFormChange}
+              placeholder="Jenis Perawatan"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            <input
+              type="text"
+              name="description"
+              value={editFormData.description}
+              onChange={handleEditFormChange}
+              placeholder="Deskripsi"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
+            >
+              Simpan
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelClick}
+              className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
+            >
+              Batal
+            </button>
+          </div>
         </form>
       )}
 
       {/* Tabel Jadwal */}
-      <table className="table-auto w-full mt-6">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">Tanggal</th>
-            <th className="border px-4 py-2">Jenis Perawatan</th>
-            <th className="border px-4 py-2">Deskripsi</th>
-            <th className="border px-4 py-2">Status</th>
-            <th className="border px-4 py-2">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {schedules.map((schedule) => (
-            <tr key={schedule.id}>
-              <td className="border px-4 py-2">{schedule.date}</td>
-              <td className="border px-4 py-2">{schedule.type}</td>
-              <td className="border px-4 py-2">{schedule.description}</td>
-              <td className={`border px-4 py-2 ${schedule.status === "Sudah Dilaksanakan" ? "text-green-600" : "text-red-600"}`}>
-                {schedule.status}
-              </td>
-              <td className="border px-4 py-2">
-                <button
-                  onClick={() => toggleStatus(schedule.id)}
-                  className={`mr-2 px-3 py-1 rounded ${
-                    schedule.status === "Belum Dilaksanakan"
-                      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                      : "bg-green-500 hover:bg-green-600 text-white"
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse bg-white shadow-sm rounded-lg">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border-b">Tanggal</th>
+              <th className="px-4 py-2 border-b">Jenis</th>
+              <th className="px-4 py-2 border-b">Deskripsi</th>
+              <th className="px-4 py-2 border-b">Status</th>
+              <th className="px-4 py-2 border-b">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {schedules.map((schedule) => (
+              <tr key={schedule.id}>
+                <td className="px-4 py-2 border-b">{schedule.date}</td>
+                <td className="px-4 py-2 border-b">{schedule.type}</td>
+                <td className="px-4 py-2 border-b">{schedule.description}</td>
+                <td
+                  className={`px-4 py-2 border-b ${
+                    schedule.status === 'Sudah Dilaksanakan' ? 'text-green-500' : 'text-red-500'
                   }`}
                 >
-                  {schedule.status === "Belum Dilaksanakan" ? "Selesai" : "Pending"}
-                </button>
-                <button
-                  onClick={() => handleEditClick(schedule)}
-                  className="mr-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteSchedule(schedule.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {schedule.status}
+                </td>
+                <td className="px-4 py-2 border-b">
+                  <button
+                    onClick={() => toggleStatus(schedule.id)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"
+                  >
+                    Toggle Status
+                  </button>
+                  <button
+                    onClick={() => handleEditClick(schedule)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteSchedule(schedule.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,19 @@
       "status": "Sudah Dilaksanakan"
     }
   ],
-  "harvests": [],
-  "reports": []
+  "harvests": [
+    {
+      "id": "440e",
+      "date": "2025-01-10",
+      "amount": "10",
+      "description": "minggu 2"
+    }
+  ],
+  "reports": [
+    {
+      "id": "7510",
+      "note": "kendala cuaca",
+      "date": "2025-01-09"
+    }
+  ]
 }

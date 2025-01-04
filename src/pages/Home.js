@@ -1,22 +1,15 @@
-// src/pages/Home.js
-
-import React from "react";
-import Dashboard from "../components/Dashboard";
+import React from 'react';
+import Dashboard from '../components/Dashboard';
 
 /**
- * Halaman Home yang menampilkan Dashboard dan ringkasan fitur aplikasi.
+ * Halaman Home yang menampilkan Dashboard.
+ * - Menyediakan struktur yang responsif.
  */
 function Home() {
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-bold text-greenGoPalm mb-6">
-        Selamat Datang di GoPalm
-      </h1>
-      <p className="text-lg text-gray-600 mb-8">
-        Kelola kebun sawit Anda dengan mudah menggunakan fitur manajemen jadwal
-        perawatan, pengelolaan panen, dan laporan lengkap.
-      </p>
-      <div className="bg-gradient-to-r from-greenGoPalm to-orangeGoPalm p-6 rounded-lg shadow-lg">
+    <div className="container mx-auto px-4 py-6 bg-gradient-to-b from-greenGoPalm to-orangeGoPalm min-h-screen">
+      <h1 className="text-3xl font-bold text-white text-center mb-6">Beranda</h1>
+      <div className="bg-white shadow-lg rounded-lg p-6">
         <Dashboard />
       </div>
     </div>

@@ -1,224 +1,195 @@
 // src/components/Report.js
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 /**
- * BASE_URL untuk JSON Server.
- * Pastikan URL ini sesuai dengan lokasi di mana JSON Server berjalan.
+ * Komponen Report untuk mengelola catatan laporan (CRUD)
  */
-const BASE_URL = "http://localhost:5000";
-
 function Report() {
-  const [reports, setReports] = useState([]);
-  const [newReport, setNewReport] = useState({ title: "", content: "" });
-  const [editReportId, setEditReportId] = useState(null);
-  const [editFormData, setEditFormData] = useState({ title: "", content: "" });
+  const [reports, setReports] = useState([]); // State untuk data laporan
+  const [newReport, setNewReport] = useState({ note: "", date: "" }); // State untuk menambah laporan
+  const [editReportId, setEditReportId] = useState(null); // ID laporan yang sedang diedit
+  const [editFormData, setEditFormData] = useState({ note: "", date: "" }); // State form edit laporan
 
-  /**
-   * Mengambil data laporan dari JSON Server saat komponen dimuat.
-   */
+  const baseURL = "http://localhost:5000/reports"; // Endpoint API
+
+  // Mendapatkan data laporan dari server JSON saat pertama kali komponen dimuat
   useEffect(() => {
-    fetch(`${BASE_URL}/reports`)
-      .then((response) => response.json())
-      .then((data) => setReports(data))
-      .catch((error) => console.error("Error fetching reports:", error));
+    const fetchReports = async () => {
+      try {
+        const response = await axios.get(baseURL);
+        setReports(response.data);
+      } catch (error) {
+        console.error("Error fetching reports:", error.message);
+      }
+    };
+
+    fetchReports();
   }, []);
 
-  /**
-   * Menangani perubahan input pada form tambah laporan.
-   */
+  // Menangani perubahan input pada form tambah laporan
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewReport((prev) => ({ ...prev, [name]: value }));
+    setNewReport({ ...newReport, [name]: value });
   };
 
-  /**
-   * Menambah laporan baru ke JSON Server.
-   */
-  const addReport = () => {
-    const { title, content } = newReport;
+  // Menangani perubahan input pada form edit laporan
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({ ...editFormData, [name]: value });
+  };
 
-    if (title && content) {
-      fetch(`${BASE_URL}/reports`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newReport),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setReports((prev) => [...prev, data]);
-          setNewReport({ title: "", content: "" });
-        })
-        .catch((error) => console.error("Error adding report:", error));
+  // Menambah laporan baru
+  const addReport = async () => {
+    if (newReport.note && newReport.date) {
+      try {
+        const response = await axios.post(baseURL, newReport);
+        setReports([...reports, response.data]);
+        setNewReport({ note: "", date: "" }); // Reset form
+      } catch (error) {
+        console.error("Error adding report:", error.message);
+      }
     } else {
-      alert("Harap isi semua field sebelum menambah laporan.");
+      alert("Harap isi semua field!");
     }
   };
 
-  /**
-   * Menghapus laporan dari JSON Server.
-   */
-  const deleteReport = (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus laporan ini?")) {
-      fetch(`${BASE_URL}/reports/${id}`, { method: "DELETE" })
-        .then(() => setReports((prev) => prev.filter((report) => report.id !== id)))
-        .catch((error) => console.error("Error deleting report:", error));
+  // Menghapus laporan berdasarkan ID
+  const deleteReport = async (id) => {
+    try {
+      await axios.delete(`${baseURL}/${id}`);
+      setReports(reports.filter((report) => report.id !== id));
+    } catch (error) {
+      console.error("Error deleting report:", error.message);
     }
   };
 
-  /**
-   * Memulai proses edit laporan.
-   */
-  const handleEditClick = (report) => {
+  // Mengedit laporan
+  const editReport = (report) => {
     setEditReportId(report.id);
-    setEditFormData({
-      title: report.title,
-      content: report.content,
-    });
+    setEditFormData({ note: report.note, date: report.date });
   };
 
-  /**
-   * Menyimpan perubahan laporan ke JSON Server.
-   */
-  const handleEditFormSubmit = (e) => {
-    e.preventDefault();
-    const { title, content } = editFormData;
-
-    if (title && content) {
-      fetch(`${BASE_URL}/reports/${editReportId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editFormData),
-      })
-        .then((response) => response.json())
-        .then((updatedReport) => {
-          setReports((prev) =>
-            prev.map((report) => (report.id === editReportId ? updatedReport : report))
-          );
-          setEditReportId(null);
-          setEditFormData({ title: "", content: "" });
-        })
-        .catch((error) => console.error("Error updating report:", error));
-    } else {
-      alert("Harap isi semua field sebelum menyimpan perubahan.");
+  // Menyimpan perubahan laporan
+  const saveEditedReport = async (id) => {
+    try {
+      const response = await axios.put(`${baseURL}/${id}`, editFormData);
+      setReports(
+        reports.map((report) =>
+          report.id === id ? { ...response.data } : report
+        )
+      );
+      setEditReportId(null); // Selesai edit
+      setEditFormData({ note: "", date: "" }); // Reset form edit
+    } catch (error) {
+      console.error("Error updating report:", error.message);
     }
   };
 
-  /**
-   * Membatalkan proses edit.
-   */
-  const handleCancelClick = () => {
+  // Membatalkan proses edit
+  const cancelEdit = () => {
     setEditReportId(null);
-    setEditFormData({ title: "", content: "" });
+    setEditFormData({ note: "", date: "" });
   };
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-greenGoPalm mb-6">Laporan</h2>
+      <h2 className="text-2xl font-bold text-greenGoPalm mb-4">
+        Laporan Perawatan & Panen
+      </h2>
 
       {/* Form Tambah Laporan */}
       <div className="mb-6">
         <input
           type="text"
-          name="title"
-          value={newReport.title}
+          name="note"
+          value={newReport.note}
           onChange={handleInputChange}
-          placeholder="Judul Laporan"
-          className="border border-gray-300 p-2 rounded mr-2 mb-2 w-full"
+          placeholder="Catatan"
+          className="border border-gray-300 p-2 rounded mr-2"
         />
-        <textarea
-          name="content"
-          value={newReport.content}
+        <input
+          type="date"
+          name="date"
+          value={newReport.date}
           onChange={handleInputChange}
-          placeholder="Isi Laporan"
-          className="border border-gray-300 p-2 rounded mr-2 mb-2 w-full"
-          rows="4"
+          className="border border-gray-300 p-2 rounded mr-2"
         />
         <button
           onClick={addReport}
-          className="bg-orangeGoPalm text-white py-2 px-4 rounded hover:bg-greenGoPalm transition duration-300"
+          className="bg-orangeGoPalm text-white py-2 px-4 rounded hover:bg-greenGoPalm"
         >
           Tambah Laporan
         </button>
       </div>
 
-      {/* Form Edit Laporan */}
-      {editReportId && (
-        <form onSubmit={handleEditFormSubmit} className="mb-6 bg-gray-100 p-4 rounded">
-          <h3 className="text-xl font-semibold mb-4 text-greenGoPalm">Edit Laporan</h3>
-          <input
-            type="text"
-            name="title"
-            value={editFormData.title}
-            onChange={(e) =>
-              setEditFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-            }
-            placeholder="Judul Laporan"
-            className="border border-gray-300 p-2 rounded mr-2 mb-2 w-full"
-          />
-          <textarea
-            name="content"
-            value={editFormData.content}
-            onChange={(e) =>
-              setEditFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-            }
-            placeholder="Isi Laporan"
-            className="border border-gray-300 p-2 rounded mr-2 mb-2 w-full"
-            rows="4"
-          />
-          <div className="flex">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded mr-2 hover:bg-blue-600 transition duration-300"
-            >
-              Simpan
-            </button>
-            <button
-              type="button"
-              onClick={handleCancelClick}
-              className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
-            >
-              Batal
-            </button>
-          </div>
-        </form>
-      )}
-
       {/* Tabel Laporan */}
-      <table className="table-auto w-full mt-6">
+      <table className="min-w-full bg-white rounded shadow-lg overflow-hidden">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Judul</th>
-            <th className="border px-4 py-2">Isi</th>
-            <th className="border px-4 py-2">Aksi</th>
+            <th className="px-4 py-2 border-b">Catatan</th>
+            <th className="px-4 py-2 border-b">Tanggal</th>
+            <th className="px-4 py-2 border-b">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          {reports.length === 0 ? (
-            <tr>
-              <td colSpan="3" className="text-center py-4">Tidak ada laporan.</td>
-            </tr>
-          ) : (
-            reports.map((report) => (
+          {reports.map((report) =>
+            editReportId === report.id ? (
               <tr key={report.id}>
-                <td className="border px-4 py-2">{report.title}</td>
-                <td className="border px-4 py-2">{report.content}</td>
-                <td className="border px-4 py-2">
+                <td className="px-4 py-2 border-b">
+                  <input
+                    type="text"
+                    name="note"
+                    value={editFormData.note}
+                    onChange={handleEditInputChange}
+                    className="border border-gray-300 p-2 rounded w-full"
+                  />
+                </td>
+                <td className="px-4 py-2 border-b">
+                  <input
+                    type="date"
+                    name="date"
+                    value={editFormData.date}
+                    onChange={handleEditInputChange}
+                    className="border border-gray-300 p-2 rounded w-full"
+                  />
+                </td>
+                <td className="px-4 py-2 border-b">
                   <button
-                    onClick={() => handleEditClick(report)}
-                    className="mr-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                    onClick={() => saveEditedReport(report.id)}
+                    className="bg-greenGoPalm text-white py-1 px-3 rounded mr-2"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="bg-gray-500 text-white py-1 px-3 rounded"
+                  >
+                    Batal
+                  </button>
+                </td>
+              </tr>
+            ) : (
+              <tr key={report.id}>
+                <td className="px-4 py-2 border-b">{report.note}</td>
+                <td className="px-4 py-2 border-b">{report.date}</td>
+                <td className="px-4 py-2 border-b">
+                  <button
+                    onClick={() => editReport(report)}
+                    className="bg-blue-500 text-white py-1 px-3 rounded mr-2"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteReport(report.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-red-500 text-white py-1 px-3 rounded"
                   >
                     Hapus
                   </button>
                 </td>
               </tr>
-            ))
+            )
           )}
         </tbody>
       </table>

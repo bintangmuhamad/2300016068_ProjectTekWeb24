@@ -1,5 +1,3 @@
-/* src/index.css */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,13 +7,43 @@ body {
 }
 
 .bg-greenGoPalm {
-  background-color: #6DBF57; /* Warna hijau khas GoPalm */
+  background-color: #6DBF57; /* Hijau khas GoPalm */
 }
 
 .bg-orangeGoPalm {
-  background-color: #FFA500; /* Warna orange khas GoPalm */
+  background-color: #FFA500; /* Oranye khas GoPalm */
 }
 
 .text-orangeGoPalm {
-  color: #FFA500; /* Warna orange khas GoPalm */
+  color: #ec632d; /* Oranye khas GoPalm */
+}
+.text-whiteGoPalm{
+  color: #e8e6e3; /* Putih khas GoPalm */
+}
+.text-greenGoPalm {
+  color: #6DBF57; /* Hijau khas GoPalm */
+}
+
+.container {
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
 }

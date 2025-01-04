@@ -1,14 +1,11 @@
-// src/components/Footer.js
+import React from 'react';
 
-import React from "react";
-
-/**
- * Komponen Footer untuk menampilkan informasi hak cipta.
- */
 function Footer() {
   return (
-    <footer className="bg-greenGoPalm text-white text-center p-4">
-      <p>&copy; {new Date().getFullYear()} GoPalm. Semua hak cipta dilindungi.</p>
+    <footer className="bg-greenGoPalm text-white py-4">
+      <div className="container mx-auto text-center text-sm lg:text-base">
+        <p>&copy; {new Date().getFullYear()} GoPalm. Semua hak cipta dilindungi.</p>
+      </div>
     </footer>
   );
 }
