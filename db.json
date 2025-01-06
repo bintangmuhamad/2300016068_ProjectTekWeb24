@@ -1,10 +1,17 @@
 {
   "schedules": [
     {
-      "id": "d417",
       "date": "2025-01-02",
-      "type": "semprot",
-      "description": "ibu ibu semprot",
+      "type": "Penyemprotan",
+      "description": "pupuk organik",
+      "id": "d417",
+      "status": "Belum Dilaksanakan"
+    },
+    {
+      "id": "eb10",
+      "date": "2025-01-06",
+      "type": "Pemangkasan Daun",
+      "description": "100 pohon ",
       "status": "Sudah Dilaksanakan"
     }
   ],
@@ -14,13 +21,19 @@
       "date": "2025-01-10",
       "amount": "10",
       "description": "minggu 2"
+    },
+    {
+      "id": "03ca",
+      "date": "2025-01-06",
+      "amount": "200",
+      "description": "Pagi hari yang cerah"
     }
   ],
   "reports": [
     {
-      "id": "7510",
-      "note": "kendala cuaca",
-      "date": "2025-01-09"
+      "note": "Pemanenan terhambat karena kendala cuaca sehingga hasil panen tidak maksimal",
+      "date": "2025-01-09",
+      "id": "7510"
     }
   ]
 }

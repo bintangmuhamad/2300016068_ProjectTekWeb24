@@ -1,91 +1,65 @@
-import React, { useState, useContext } from 'react';
+// src/components/Navbar.js
+
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
+/**
+ * Komponen Navbar untuk navigasi antar halaman
+ * Menampilkan tautan berbeda berdasarkan status autentikasi
+ */
 function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
 
+  /**
+   * Fungsi untuk menangani logout pengguna
+   */
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
   return (
-    <nav className="bg-orangeGoPalm px-4 py-3">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <Link to="/" className="text-white font-bold text-lg">
+    <nav className="bg-gradient-to-r from-greenGoPalm to-orangeGoPalm p-4 shadow-md">
+      <div className="flex justify-between items-center container mx-auto">
+        {/* Nama Aplikasi */}
+        <Link to="/" className="text-white font-bold text-xl">
           GoPalm
         </Link>
 
-        {/* Menu Button for Mobile */}
-        <button
-          className="block lg:hidden text-white focus:outline-none"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <svg
-            className="w-6 h-6"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d={menuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
-            />
-          </svg>
-        </button>
-
-        {/* Menu Links */}
-        <div
-          className={`${
-            menuOpen ? 'block' : 'hidden'
-          } lg:flex lg:items-center lg:gap-4`}
-        >
+        {/* Navigasi */}
+        <div>
+          <Link to="/" className="text-white mx-2 hover:text-gray-300">
+            Home
+          </Link>
           {user ? (
             <>
-              <Link
-                to="/schedule"
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
-              >
+              <Link to="/schedule" className="text-white mx-2 hover:text-gray-300">
                 Jadwal Perawatan
               </Link>
-              <Link
-                to="/harvest"
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
-              >
+              <Link to="/harvest" className="text-white mx-2 hover:text-gray-300">
                 Pengelolaan Panen
               </Link>
-              <Link
-                to="/report"
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
-              >
+              <Link to="/report" className="text-white mx-2 hover:text-gray-300">
                 Laporan
+              </Link>
+              <Link to="/about" className="text-white mx-2 hover:text-gray-300">
+                Tentang Aplikasi
               </Link>
               <button
                 onClick={handleLogout}
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
+                className="text-white mx-2 hover:text-gray-300"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
-              >
+              <Link to="/login" className="text-white mx-2 hover:text-gray-300">
                 Login
               </Link>
-              <Link
-                to="/register"
-                className="block lg:inline-block text-white hover:text-greenGoPalm"
-              >
+              <Link to="/register" className="text-white mx-2 hover:text-gray-300">
                 Daftar
               </Link>
             </>

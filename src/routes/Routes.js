@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import Schedule from '../pages/Schedule';
 import Harvest from '../pages/Harvest';
 import ReportPage from '../pages/ReportPage';
+import About from '../pages/About'; // Import halaman About
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -19,6 +20,9 @@ function RouteList() {
       {/* Rute untuk autentikasi */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+
+      {/* Rute halaman Tentang Aplikasi */}
+      <Route path="/about" element={<About />} />
 
       {/* Rute yang dilindungi */}
       <Route 
